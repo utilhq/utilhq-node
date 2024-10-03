@@ -6,7 +6,9 @@
 
 [![npm version](https://img.shields.io/npm/v/@utilhq/sdk?style=flat)](https://www.npmjs.com/package/@utilhq/sdk) [![Documentation](https://img.shields.io/badge/documentation-informational)](https://utilhq.com/docs) [![Twitter](https://img.shields.io/twitter/follow/useutilhq.svg?color=%2338A1F3&label=twitter&style=flat)](https://twitter.com/useutilhq) [![Discord](https://img.shields.io/badge/discord-join-blueviolet)](https://utilhq.com/discord)
 
-[utilhq](https://utilhq.com) lets you quickly build internal web apps (think: customer support tools, admin panels, etc.) just by writing backend Node.js code.
+[utilhq](https://utilhq.com) is a fork of [interval/interval-node](https://github.com/interval/interval-node) and is intended as a drop-in replacement.
+
+utilhq lets you quickly build internal web apps (think: customer support tools, admin panels, etc.) just by writing backend Node.js code.
 
 This is our Node.js SDK which connects to the utilhq.com web app. If you don't have an utilhq account, you can [create one here](https://utilhq.com/signup). All core features are free to use.
 
