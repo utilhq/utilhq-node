@@ -57,14 +57,14 @@ import {
   MultipleableInputIOComponentFunction,
 } from '../types'
 import { stripUndefined } from '../utils/deserialize'
-import { IntervalError } from '..'
+import { UtilHQError } from '..'
 
 interface ClientConfig {
   logger: Logger
   send: IORenderSender
   isDemo?: boolean
   displayResolvesImmediately?: boolean
-  // onAddInlineAction: (handler: IntervalActionHandler) => string
+  // onAddInlineAction: (handler: UtilHQActionHandler) => string
 }
 
 export type IOClientRenderReturnValues<
@@ -99,7 +99,7 @@ export class IOClient {
   send: IORenderSender
   isDemo: boolean
   displayResolvesImmediately: boolean | undefined
-  // onAddInlineAction: (handler: IntervalActionHandler) => string
+  // onAddInlineAction: (handler: UtilHQActionHandler) => string
 
   previousInputGroupKey: string | undefined
   onResponseHandlers = new Map<string, ResponseHandlerFn>()
@@ -114,7 +114,7 @@ export class IOClient {
     // this.onAddInlineAction = config.onAddInlineAction
   }
 
-  // addInlineAction(handler: IntervalActionHandler): string {
+  // addInlineAction(handler: UtilHQActionHandler): string {
   //   const key = this.onAddInlineAction(handler)
   //   this.inlineActionKeys.add(key)
   //   return key
@@ -125,8 +125,8 @@ export class IOClient {
    *
    * Given a list of components (potentially only one if not rendering a group)
    * this method is responsible for sending the initial render call and handling
-   * responses (returns, state updates, or cancellations) from Interval.
-   * Resolves when it receives final responses or from Interval,
+   * responses (returns, state updates, or cancellations) from utilhq.
+   * Resolves when it receives final responses or from utilhq,
    * or throws an IOError of kind `CANCELED` if canceled.
    */
   async renderComponents<
@@ -199,7 +199,7 @@ export class IOClient {
               return
             }
 
-            // Transaction canceled from Interval cloud UI
+            // Transaction canceled from utilhq cloud UI
             if (result.kind === 'CANCELED') {
               this.isCanceled = true
               reject(new IOError('CANCELED'))
@@ -387,7 +387,7 @@ export class IOClient {
     )
 
     if (exclusivePromises.length > 0) {
-      throw new IntervalError(
+      throw new UtilHQError(
         `Components with the following labels are not supported inside groups, please remove them from the group: ${exclusivePromises
           .map(pi => pi.component.label)
           .join(', ')}`
@@ -399,7 +399,7 @@ export class IOClient {
     )
 
     if (withChoicesPromises.length > 0) {
-      throw new IntervalError(
+      throw new UtilHQError(
         `Components with the following labels are chained with withChoices, which is not supported inside a group (call withChoices on the group itself instead): ${exclusivePromises
           .map(pi => pi.component.label)
           .join(', ')}`
@@ -649,7 +649,7 @@ export class IOClient {
   ): ExclusiveIOComponentFunction<MethodName, Props, Output> {
     return (label: string, props?: Props) => {
       if (demoUnsupported && this.isDemo) {
-        throw new IntervalError(
+        throw new UtilHQError(
           `The ${methodName} method isn't supported in demo mode`
         )
       }
@@ -1154,7 +1154,7 @@ export class IOClient {
          *
          * Grid items can include a label, description, image, and options menu, and can optionally link to another page, action, or external URL.
          *
-         * Grid item size can be controlled using the idealColumnWidth property. Interval will calculate a column width that is as close as possible to that number while factoring in gutter size and window width.
+         * Grid item size can be controlled using the idealColumnWidth property. utilhq will calculate a column width that is as close as possible to that number while factoring in gutter size and window width.
          *
          * Images default to a 16:9 aspect ratio with `object-fit` set to cover, and can be customized via the `image.aspectRatio` and `image.fit` properties respectively in the renderItem callback.
          *

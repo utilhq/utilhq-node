@@ -20,21 +20,21 @@ import type {
   ActionCtx,
   ActionLogFn,
   IO,
-  IntervalActionHandler,
-  IntervalActionStore,
+  UtilHQActionHandler,
+  UtilHQActionStore,
   NotifyConfig,
-  IntervalRouteDefinitions,
-  IntervalPageStore,
+  UtilHQRouteDefinitions,
+  UtilHQPageStore,
   PageCtx,
-  IntervalActionDefinition,
-  IntervalErrorHandler,
+  UtilHQActionDefinition,
+  UtilHQErrorHandler,
 } from './types'
-import IntervalError from './classes/IntervalError'
-import IntervalClient, {
+import UtilHQError from './classes/UtilHQError'
+import UtilHQClient, {
   getHttpEndpoint,
   actionLocalStorage,
   pageLocalStorage,
-} from './classes/IntervalClient'
+} from './classes/UtilHQClient'
 import Action from './classes/Action'
 import { BasicLayout } from './classes/Layout'
 import { Evt } from 'evt'
@@ -44,18 +44,18 @@ export type {
   ActionCtx,
   ActionLogFn,
   IO,
-  IntervalActionHandler,
-  IntervalActionDefinition,
-  IntervalActionStore,
+  UtilHQActionHandler,
+  UtilHQActionDefinition,
+  UtilHQActionStore,
 }
 
 export interface InternalConfig {
   apiKey: string
   endpoint: string
-  routes?: IntervalRouteDefinitions
+  routes?: UtilHQRouteDefinitions
   routesDirectory?: string
   // TODO: Mark as deprecated soon, remove soon afterward
-  actions?: Record<string, IntervalActionDefinition>
+  actions?: Record<string, UtilHQActionDefinition>
   // TODO: Mark as deprecated soon, remove soon afterward
   groups?: Record<string, Page>
   logLevel?: LogLevel
@@ -70,7 +70,7 @@ export interface InternalConfig {
 
   closeUnresponsiveConnectionTimeoutMs?: number
   reinitializeBatchTimeoutMs?: number
-  onError?: IntervalErrorHandler
+  onError?: UtilHQErrorHandler
   verboseMessageLogs?: boolean
 
   /* @internal */ getClientHandlers?: () =>
@@ -87,16 +87,16 @@ export interface QueuedAction {
   params?: SerializableRecord
 }
 
-export function getActionStore(): IntervalActionStore {
+export function getActionStore(): UtilHQActionStore {
   if (!actionLocalStorage) {
-    throw new IntervalError(
+    throw new UtilHQError(
       'Global io and ctx objects are only available in a Node.js context.'
     )
   }
 
   const store = actionLocalStorage.getStore()
   if (!store) {
-    throw new IntervalError(
+    throw new UtilHQError(
       'Global io and ctx objects can only be used inside a Page or Action.'
     )
   }
@@ -104,16 +104,16 @@ export function getActionStore(): IntervalActionStore {
   return store
 }
 
-export function getPageStore(): IntervalPageStore {
+export function getPageStore(): UtilHQPageStore {
   if (!pageLocalStorage) {
-    throw new IntervalError(
+    throw new UtilHQError(
       'Global io and ctx objects are only available in a Node.js context.'
     )
   }
 
   const store = pageLocalStorage.getStore()
   if (!store) {
-    throw new IntervalError(
+    throw new UtilHQError(
       'Global io and ctx objects can only be used inside a Page or Action.'
     )
   }
@@ -121,7 +121,7 @@ export function getPageStore(): IntervalPageStore {
   return store
 }
 
-export function getSomeStore(): IntervalActionStore | IntervalPageStore {
+export function getSomeStore(): UtilHQActionStore | UtilHQPageStore {
   try {
     return getPageStore()
   } catch (err) {
@@ -161,10 +161,10 @@ export const ctx: ActionCtx & PageCtx = {
   get redirect() { return getSomeStore().ctx.redirect },
 }
 
-export default class Interval {
+export default class UtilHQ {
   config: InternalConfig
   #logger: Logger
-  #client: IntervalClient | undefined
+  #client: UtilHQClient | undefined
   #apiKey: string | undefined
   #httpEndpoint: string
   #groupChangeCtx = Evt.newCtx()
@@ -228,11 +228,11 @@ export default class Interval {
   }
 
   /**
-   * Establish the persistent connection to Interval.
+   * Establish the persistent connection to utilhq.
    */
   async listen() {
     if (!this.#client) {
-      this.#client = new IntervalClient(this, this.config)
+      this.#client = new UtilHQClient(this, this.config)
     }
     return this.#client.listen()
   }
@@ -244,14 +244,14 @@ export default class Interval {
   }
 
   /**
-   * Immediately terminate the connection to interval, terminating any actions currently in progress.
+   * Immediately terminate the connection to utilhq, terminating any actions currently in progress.
    */
   immediatelyClose() {
     return this.#client?.immediatelyClose()
   }
 
   /**
-   * Safely close the connection to Interval, preventing new actions from being launched and closing the persistent connection afterward. Resolves when the connection is successfully safely closed.
+   * Safely close the connection to utilhq, preventing new actions from being launched and closing the persistent connection afterward. Resolves when the connection is successfully safely closed.
    */
   async safelyClose(): Promise<void> {
     return this.#client?.safelyClose()
@@ -275,7 +275,7 @@ export default class Interval {
   }
 
   /**
-   * Sends a custom notification to Interval users via email or Slack. To send Slack notifications, you'll need to connect your Slack workspace to the Interval app in your organization settings.
+   * Sends a custom notification to utilhq users via email or Slack. To send Slack notifications, you'll need to connect your Slack workspace to the utilhq app in your organization settings.
    *
    * **Usage:**
    *
@@ -285,7 +285,7 @@ export default class Interval {
    *   title: "Refund over threshold",
    *   delivery: [
    *     {
-   *       to: "#interval-notifications",
+   *       to: "#utilhq-notifications",
    *       method: "SLACK",
    *     },
    *     {
@@ -302,7 +302,7 @@ export default class Interval {
         (!this.#client?.environment && !this.#apiKey?.startsWith('live_')))
     ) {
       this.#log.warn(
-        'Calls to notify() outside of a transaction currently have no effect when Interval is instantiated with a development API key. Please use a live key to send notifications.'
+        'Calls to notify() outside of a transaction currently have no effect when utilhq is instantiated with a development API key. Please use a live key to send notifications.'
       )
     }
 
@@ -314,7 +314,7 @@ export default class Interval {
         deliveries: config.delivery || [
           {
             method: 'EMAIL',
-            to: 'demo@interval.com',
+            to: 'demo@utilhq.com',
           },
         ],
       })
@@ -330,7 +330,7 @@ export default class Interval {
       })
     } catch (err) {
       this.#logger.debug(err)
-      throw new IntervalError('Invalid input.')
+      throw new UtilHQError('Invalid input.')
     }
 
     const response = await fetch(`${this.#httpEndpoint}/api/notify`, {
@@ -345,11 +345,11 @@ export default class Interval {
       .then(r => NOTIFY.returns.parseAsync(r))
       .catch(err => {
         this.#logger.debug(err)
-        throw new IntervalError('Received invalid API response.')
+        throw new UtilHQError('Received invalid API response.')
       })
 
     if (response.type === 'error') {
-      throw new IntervalError(
+      throw new UtilHQError(
         `There was a problem sending the notification: ${response.message}`
       )
     }
@@ -383,7 +383,7 @@ export default class Interval {
       })
     } catch (err) {
       this.#logger.debug(err)
-      throw new IntervalError('Invalid input.')
+      throw new UtilHQError('Invalid input.')
     }
 
     const response = await fetch(this.#getQueueAddress('enqueue'), {
@@ -398,11 +398,11 @@ export default class Interval {
       .then(r => ENQUEUE_ACTION.returns.parseAsync(r))
       .catch(err => {
         this.#logger.debug(err)
-        throw new IntervalError('Received invalid API response.')
+        throw new UtilHQError('Received invalid API response.')
       })
 
     if (response.type === 'error') {
-      throw new IntervalError(
+      throw new UtilHQError(
         `There was a problem enqueuing the action: ${response.message}`
       )
     }
@@ -415,7 +415,7 @@ export default class Interval {
   }
 
   /**
-   * Dequeue a previously assigned action which was created with `interval.enqueue()`.
+   * Dequeue a previously assigned action which was created with `utilhq.enqueue()`.
    */
   async dequeue(id: string): Promise<QueuedAction> {
     let body: z.infer<(typeof DEQUEUE_ACTION)['inputs']>
@@ -425,7 +425,7 @@ export default class Interval {
       })
     } catch (err) {
       this.#logger.debug(err)
-      throw new IntervalError('Invalid input.')
+      throw new UtilHQError('Invalid input.')
     }
 
     const response = await fetch(this.#getQueueAddress('dequeue'), {
@@ -440,11 +440,11 @@ export default class Interval {
       .then(r => DEQUEUE_ACTION.returns.parseAsync(r))
       .catch(err => {
         this.#logger.debug(err)
-        throw new IntervalError('Received invalid API response.')
+        throw new UtilHQError('Received invalid API response.')
       })
 
     if (response.type === 'error') {
-      throw new IntervalError(
+      throw new UtilHQError(
         `There was a problem enqueuing the action: ${response.message}`
       )
     }
@@ -463,9 +463,9 @@ export default class Interval {
 }
 
 export {
-  Interval,
+  UtilHQ,
   IOError,
-  IntervalError,
+  UtilHQError,
   NotConnectedError,
   TimeoutError,
   Action,

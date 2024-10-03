@@ -1,14 +1,14 @@
-import Interval, { io, Layout, Page } from '../../index'
+import UtilHQ, { io, Layout, Page } from '../../index'
 import env from '../../env'
 
-const interval = new Interval({
+const utilhq = new UtilHQ({
   apiKey: env.DEMO_PROD_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',
   routes: {
     page: new Page({
       name: 'IO Example',
-      description: 'This is an example of the Interval SDK',
+      description: 'This is an example of the utilhq SDK',
       handler: async () => {
         return new Layout({
           children: [io.display.markdown('Hello world')],
@@ -53,4 +53,4 @@ const interval = new Interval({
   },
 })
 
-interval.listen()
+utilhq.listen()

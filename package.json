@@ -1,13 +1,13 @@
 {
-  "name": "@interval/sdk",
-  "version": "2.0.0",
-  "description": "The frontendless framework for high growth companies. Interval automatically generates apps by inlining the UI in your backend code. It's a faster and more maintainable way to build internal tools, rapid prototypes, and more.",
-  "homepage": "https://interval.com",
+  "name": "@utilhq/sdk",
+  "version": "1.0.0",
+  "description": "The frontendless framework for high growth companies. utilhq automatically generates apps by inlining the UI in your backend code. It's a faster and more maintainable way to build internal tools, rapid prototypes, and more.",
+  "homepage": "https://utilhq.com",
   "repository": {
     "type": "git",
-    "url": "github:interval/interval-node"
+    "url": "github:utilhq/utilhq-node"
   },
-  "bugs": "https://github.com/interval/interval-node/issues",
+  "bugs": "https://github.com/utilhq/utilhq-node/issues",
   "keywords": ["internal tool", "app", "ui", "ui builder"],
   "license": "MIT",
   "engines": {

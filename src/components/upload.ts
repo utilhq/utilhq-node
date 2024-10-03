@@ -1,6 +1,6 @@
 import path from 'path'
 import fetch, { Response } from 'cross-fetch'
-import { IntervalError } from '..'
+import { UtilHQError } from '..'
 import { T_IO_PROPS, T_IO_RETURNS, T_IO_STATE } from '../ioSchema'
 import Logger from '../classes/Logger'
 
@@ -19,7 +19,7 @@ async function retryFetch(url: string): Promise<Response> {
   }
 
   // This should never happen, final failing response err would be thrown above
-  throw new IntervalError('Failed to fetch file.')
+  throw new UtilHQError('Failed to fetch file.')
 }
 
 type UploaderProps = T_IO_PROPS<'UPLOAD_FILE'> & {

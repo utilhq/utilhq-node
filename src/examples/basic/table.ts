@@ -1,5 +1,5 @@
-import { IntervalActionDefinition } from '@interval/sdk/src/types'
-import { IntervalActionHandler, Action, Page, Layout, io } from '../..'
+import { UtilHQActionDefinition } from '@utilhq/sdk/src/types'
+import { UtilHQActionHandler, Action, Page, Layout, io } from '../..'
 import { faker } from '@faker-js/faker'
 import fakeUsers from '../utils/fakeUsers'
 import { generateRows, sleep } from '../utils/helpers'
@@ -7,7 +7,7 @@ import { asyncTable } from '../utils/ioMethodWrappers'
 import dedent from 'dedent'
 import { HighlightColor } from '../../ioSchema'
 
-export const no_pagination: IntervalActionHandler = async io => {
+export const no_pagination: UtilHQActionHandler = async io => {
   const data = generateRows(5)
 
   await io.display.table('Display users', {
@@ -19,7 +19,7 @@ export const no_pagination: IntervalActionHandler = async io => {
   })
 }
 
-export const paginated: IntervalActionHandler = async io => {
+export const paginated: UtilHQActionHandler = async io => {
   const data = generateRows(50)
 
   await io.display.table('Display users', {
@@ -28,7 +28,7 @@ export const paginated: IntervalActionHandler = async io => {
   })
 }
 
-export const empty: IntervalActionHandler = async io => {
+export const empty: UtilHQActionHandler = async io => {
   const data = generateRows(5)
 
   await io.display.table('Display users', {
@@ -37,7 +37,7 @@ export const empty: IntervalActionHandler = async io => {
   })
 }
 
-export const large_table: IntervalActionDefinition = {
+export const large_table: UtilHQActionDefinition = {
   name: '10k rows',
   handler: async io => {
     const data = generateRows(10_000)
@@ -49,7 +49,7 @@ export const large_table: IntervalActionDefinition = {
   },
 }
 
-export const object_cell: IntervalActionDefinition = {
+export const object_cell: UtilHQActionDefinition = {
   name: 'Object in cell',
   handler: async io => {
     const data = generateRows(10)
@@ -69,7 +69,7 @@ export const object_cell: IntervalActionDefinition = {
   },
 }
 
-export const display_table: IntervalActionHandler = async io => {
+export const display_table: UtilHQActionHandler = async io => {
   const data = generateRows(200)
 
   await io.display.table('Display users', {
@@ -218,7 +218,7 @@ export const highlighted_rows = new Action(async () => {
   })
 })
 
-export const multiple_tables: IntervalActionHandler = async io => {
+export const multiple_tables: UtilHQActionHandler = async io => {
   await io.group([
     io.display.table('Display users', {
       data: generateRows(10),
@@ -312,11 +312,11 @@ export const async_table_page = new Page({
   },
 })
 
-export const async_table: IntervalActionHandler = async () => {
+export const async_table: UtilHQActionHandler = async () => {
   await asyncTable(500)
 }
 
-export const select_table: IntervalActionHandler = async io => {
+export const select_table: UtilHQActionHandler = async io => {
   faker.seed(0)
 
   const data = generateRows(500)
@@ -373,7 +373,7 @@ export const select_table: IntervalActionHandler = async io => {
   })
 }
 
-export const table_custom: IntervalActionHandler = async io => {
+export const table_custom: UtilHQActionHandler = async io => {
   const options = [
     'id',
     'name',
@@ -489,7 +489,7 @@ export const table_custom: IntervalActionHandler = async io => {
   }
 }
 
-export const image_viewer: IntervalActionHandler = async io => {
+export const image_viewer: UtilHQActionHandler = async io => {
   const data = Array(50)
     .fill(null)
     .map((_, i) => {

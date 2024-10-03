@@ -1,12 +1,12 @@
 import http from 'http'
-import Interval, { Page, Layout } from '../../experimental'
+import UtilHQ, { Page, Layout } from '../../experimental'
 import { asyncTable } from '../utils/ioMethodWrappers'
 import env from '../../env'
 
 const sleep = async (ms: number) =>
   new Promise(resolve => setTimeout(resolve, ms))
 
-const interval = new Interval({
+const utilhq = new UtilHQ({
   apiKey: env.DEMO_PROD_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',
@@ -38,7 +38,7 @@ const server = http.createServer(async (req, res) => {
   // Simulate a slow cold-start time for a serverless function
   await sleep(2000)
 
-  return interval.httpRequestHandler(req, res)
+  return utilhq.httpRequestHandler(req, res)
 })
 
 server.listen(port)

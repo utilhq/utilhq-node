@@ -1,10 +1,10 @@
-import Interval, { Page, io, Layout } from '../..'
-import { IntervalRouteDefinitions } from '../../types'
+import UtilHQ, { Page, io, Layout } from '../..'
+import { UtilHQRouteDefinitions } from '../../types'
 import { sleep } from '../utils/helpers'
 import * as db from './db'
 import env from '../../env'
 
-const routes: IntervalRouteDefinitions = {
+const routes: UtilHQRouteDefinitions = {
   // root-level action
   hello_world: async () => {
     return 'Hello, world!'
@@ -206,16 +206,16 @@ const routes: IntervalRouteDefinitions = {
   }),
 }
 
-const interval = new Interval({
+const utilhq = new UtilHQ({
   apiKey: env.DEMO_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',
   routes,
 })
 
-interval.listen()
+utilhq.listen()
 
-const prod = new Interval({
+const prod = new UtilHQ({
   apiKey: env.DEMO_PROD_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',

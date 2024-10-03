@@ -1,8 +1,8 @@
-import Interval from '../../index'
+import UtilHQ from '../../index'
 import { sleep } from '../utils/helpers'
 import env from '../../env'
 
-const interval = new Interval({
+const utilhq = new UtilHQ({
   apiKey: env.DEMO_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',
@@ -15,10 +15,10 @@ const interval = new Interval({
   },
 })
 
-interval.listen()
+utilhq.listen()
 
 process.on('SIGINT', () => {
-  interval
+  utilhq
     .safelyClose()
     .then(() => {
       console.log('Shut down!')
@@ -28,7 +28,7 @@ process.on('SIGINT', () => {
       console.error(
         'Failed shutting down gracefully, forcibly closing connection'
       )
-      interval.immediatelyClose()
+      utilhq.immediatelyClose()
       process.exit(0)
     })
 })

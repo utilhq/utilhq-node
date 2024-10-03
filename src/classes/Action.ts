@@ -1,12 +1,12 @@
 import { AccessControlDefinition } from '../internalRpcSchema'
 import {
-  ExplicitIntervalActionDefinition,
-  IntervalActionDefinition,
-  IntervalActionHandler,
+  ExplicitUtilHQActionDefinition,
+  UtilHQActionDefinition,
+  UtilHQActionHandler,
 } from '../types'
 
-export default class Action implements ExplicitIntervalActionDefinition {
-  handler: IntervalActionHandler
+export default class Action implements ExplicitUtilHQActionDefinition {
+  handler: UtilHQActionHandler
   backgroundable?: boolean
   unlisted?: boolean
   warnOnClose?: boolean
@@ -15,7 +15,7 @@ export default class Action implements ExplicitIntervalActionDefinition {
   access?: AccessControlDefinition
 
   constructor(
-    def: ExplicitIntervalActionDefinition | IntervalActionDefinition
+    def: ExplicitUtilHQActionDefinition | UtilHQActionDefinition
   ) {
     if (typeof def === 'function') {
       this.handler = def

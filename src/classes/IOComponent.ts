@@ -53,8 +53,8 @@ export type AnyDisplayComponent = DisplayComponentMap[T_IO_DISPLAY_METHOD_NAMES]
 
 /**
  * The internal model underlying each IOPromise, responsible for constructing
- * the data transmitted to Interval for an IO component, and handling responses
- * received from Interval.
+ * the data transmitted to utilhq for an IO component, and handling responses
+ * received from utilhq.
  */
 export default class IOComponent<MethodName extends T_IO_METHOD_NAMES> {
   schema: IoSchema[MethodName]
@@ -83,12 +83,12 @@ export default class IOComponent<MethodName extends T_IO_METHOD_NAMES> {
 
   /**
    * @param options.methodName - The component's method name from ioSchema, used
-   * to determine the valid types for communication with Interval.
+   * to determine the valid types for communication with utilhq.
    * @param options.label - The UI label to be displayed to the action runner.
-   * @param options.initialProps - The properties send to Interval for the initial
+   * @param options.initialProps - The properties send to utilhq for the initial
    * render call.
    * @param options.handleStateChange - A handler that converts new state received
-   * from Interval into a new set of props.
+   * from utilhq into a new set of props.
    * @param options.isOptional - If true, the input can be omitted by the action
    * runner, in which case the component will accept and return `undefined`.
    */
@@ -133,7 +133,7 @@ export default class IOComponent<MethodName extends T_IO_METHOD_NAMES> {
       initialProps = this.schema.props.parse(initialProps ?? {})
     } catch (err) {
       console.error(
-        `[Interval] Invalid props found for IO call with label "${label}":`
+        `[utilhq] Invalid props found for IO call with label "${label}":`
       )
       console.error(err)
       throw err

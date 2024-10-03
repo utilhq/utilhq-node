@@ -4,4 +4,4 @@ dist
 *.tgz
 pm2.config.js
 .env
-*/.interval.config.json
+*/.utilhq.config.json

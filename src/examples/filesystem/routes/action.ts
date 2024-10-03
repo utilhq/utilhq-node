@@ -1,7 +1,7 @@
 import fs from 'fs'
-import { IntervalActionDefinition } from '../../../types'
+import { UtilHQActionDefinition } from '../../../types'
 
-const action: IntervalActionDefinition = {
+const action: UtilHQActionDefinition = {
   name: 'File-based object-based action',
   description: 'Defined in a file, as a plain object',
   handler: async io => {

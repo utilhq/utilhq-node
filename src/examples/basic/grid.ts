@@ -1,5 +1,5 @@
-import { Action } from '@interval/sdk/src/experimental'
-import { IntervalActionHandler, io } from '../..'
+import { Action } from '@utilhq/sdk/src/experimental'
+import { UtilHQActionHandler, io } from '../..'
 import { faker } from '@faker-js/faker'
 import { sleep } from '../utils/helpers'
 
@@ -81,7 +81,7 @@ export const tiktoks = new Action({
   },
 })
 
-export const no_images: IntervalActionHandler = async io => {
+export const no_images: UtilHQActionHandler = async io => {
   const data = Array(50)
     .fill(null)
     .map((_, i) => ({
@@ -100,7 +100,7 @@ export const no_images: IntervalActionHandler = async io => {
     idealColumnWidth: 300,
     renderItem: row => ({
       ...row,
-      url: 'https://interval.com',
+      url: 'https://utilhq.com',
       menu: [
         {
           label: 'View',
@@ -111,7 +111,7 @@ export const no_images: IntervalActionHandler = async io => {
   })
 }
 
-export const only_images: IntervalActionHandler = async io => {
+export const only_images: UtilHQActionHandler = async io => {
   const data = Array(50)
     .fill(null)
     .map((_, i) => ({
@@ -237,7 +237,7 @@ export const empty_state = new Action({
   },
 })
 
-export const async_grid: IntervalActionHandler = async io => {
+export const async_grid: UtilHQActionHandler = async io => {
   const allData = Array(500)
     .fill(null)
     .map((_, i) => ({

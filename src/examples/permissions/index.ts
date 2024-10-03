@@ -1,9 +1,9 @@
-import { IntervalActionDefinition } from '@interval/sdk/src/types'
-import Interval, { Layout, Page, io } from '../..'
-import { IntervalRouteDefinitions } from '../../types'
+import { UtilHQActionDefinition } from '@utilhq/sdk/src/types'
+import UtilHQ, { Layout, Page, io } from '../..'
+import { UtilHQRouteDefinitions } from '../../types'
 import env from '../../env'
 
-const actions: Record<string, IntervalActionDefinition> = {
+const actions: Record<string, UtilHQActionDefinition> = {
   engineers: {
     name: 'Engineers action',
     description: 'This action can only be run by the Engineers team.',
@@ -53,7 +53,7 @@ const actions: Record<string, IntervalActionDefinition> = {
   },
 }
 
-const routes: IntervalRouteDefinitions = {
+const routes: UtilHQRouteDefinitions = {
   ...actions,
   engineersGroup: new Page({
     name: 'Engineers actions',
@@ -128,16 +128,16 @@ const routes: IntervalRouteDefinitions = {
   }),
 }
 
-const interval = new Interval({
+const utilhq = new UtilHQ({
   apiKey: env.DEMO_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',
   routes,
 })
 
-interval.listen()
+utilhq.listen()
 
-const prod = new Interval({
+const prod = new UtilHQ({
   apiKey: env.DEMO_PROD_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',

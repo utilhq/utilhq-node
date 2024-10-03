@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import fetch from 'cross-fetch'
 import type { IncomingMessage, ServerResponse } from 'http'
-import Interval, { io, ctx, InternalConfig, IntervalError } from '.'
-import IntervalClient from './classes/IntervalClient'
+import UtilHQ, { io, ctx, InternalConfig, UtilHQError } from '.'
+import UtilHQClient from './classes/UtilHQClient'
 import Page from './classes/Page'
 import * as pkg from '../package.json'
 import { DECLARE_HOST } from './internalRpcSchema'
@@ -15,7 +15,7 @@ import {
 import Action from './classes/Action'
 import { BasicLayout } from './classes/Layout'
 
-class ExperimentalInterval extends Interval {
+class ExperimentalUtilHQ extends UtilHQ {
   /*
    * Handle a serverless host endpoint request. Receives the deserialized request body object.
    */
@@ -36,7 +36,7 @@ class ExperimentalInterval extends Interval {
 
   // A getter that returns a function instead of a method to avoid `this` binding issues.
   get httpRequestHandler() {
-    const interval = this
+    const utilhq = this
 
     return async (req: IncomingMessage, res: ServerResponse) => {
       // TODO: Proper headers
@@ -55,10 +55,10 @@ class ExperimentalInterval extends Interval {
           return res.writeHead(400).end()
         }
 
-        const successful = await interval.handleRequest(body)
+        const successful = await utilhq.handleRequest(body)
         return res.writeHead(successful ? 200 : 400).end()
       } catch (err) {
-        interval.log.error('Error in HTTP request handler:', err)
+        utilhq.log.error('Error in HTTP request handler:', err)
         return res.writeHead(500).end()
       }
     }
@@ -66,7 +66,7 @@ class ExperimentalInterval extends Interval {
 
   // A getter that returns a function instead of a method to avoid `this` binding issues.
   get lambdaRequestHandler() {
-    const interval = this
+    const utilhq = this
 
     return async (event: LambdaRequestPayload) => {
       function makeResponse(
@@ -112,7 +112,7 @@ class ExperimentalInterval extends Interval {
           return makeResponse(400)
         }
 
-        const successful = await interval.handleRequest(body)
+        const successful = await utilhq.handleRequest(body)
         return makeResponse(successful ? 200 : 500)
       } catch (err) {
         this.log.error('Error in Lambda handler', err)
@@ -122,14 +122,14 @@ class ExperimentalInterval extends Interval {
   }
 
   /**
-   * Always creates a new host connection to Interval and uses it only for the single request.
+   * Always creates a new host connection to utilhq and uses it only for the single request.
    */
   async #respondToRequest(requestId: string) {
     if (!requestId) {
       throw new Error('Missing request ID')
     }
 
-    const client = new IntervalClient(this, this.config)
+    const client = new UtilHQClient(this, this.config)
     const response = await client.respondToRequest(requestId)
 
     client.immediatelyClose()
@@ -138,7 +138,7 @@ class ExperimentalInterval extends Interval {
   }
 
   async #declareHost(httpHostId: string) {
-    const client = new IntervalClient(this, this.config)
+    const client = new UtilHQClient(this, this.config)
     const response = await client.declareHost(httpHostId)
 
     client.immediatelyClose()
@@ -155,9 +155,9 @@ export {
   Action,
   io,
   ctx,
-  IntervalError,
-  ExperimentalInterval as Interval,
+  UtilHQError,
+  ExperimentalUtilHQ as UtilHQ,
   BasicLayout as Layout,
 }
 
-export default ExperimentalInterval
+export default ExperimentalUtilHQ

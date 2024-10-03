@@ -27,7 +27,7 @@ export default class TransactionLoadingState {
       // many loading calls
       this.#sendTimeout = setTimeout(() => {
         this.#sender(this.#state ?? {}).catch(err => {
-          this.#logger.error('Failed sending loading state to Interval')
+          this.#logger.error('Failed sending loading state to utilhq')
           this.#logger.debug(err)
         })
         this.#sendTimeout = null

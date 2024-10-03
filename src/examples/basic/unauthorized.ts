@@ -1,9 +1,9 @@
-import { IntervalActionHandler } from '../..'
+import { UtilHQActionHandler } from '../..'
 
-const unauthorized: IntervalActionHandler = async io => {
+const unauthorized: UtilHQActionHandler = async io => {
   const email = await io.input.email('Email address')
 
-  if (!email.includes('@interval.com')) {
+  if (!email.includes('@utilhq.com')) {
     throw new Error('Unauthorized')
   }
 
@@ -12,7 +12,7 @@ const unauthorized: IntervalActionHandler = async io => {
   return {
     name,
     email,
-    'Download data': 'https://interval.com/export.zip',
+    'Download data': 'https://utilhq.com/export.zip',
   }
 }
 

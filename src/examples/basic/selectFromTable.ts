@@ -1,11 +1,11 @@
-import { IntervalActionHandler } from '../..'
+import { UtilHQActionHandler } from '../..'
 import { faker } from '@faker-js/faker'
 
 const charges = [
   {
     id: 'b717a9cf-4a3e-41ab-bcda-e2f3ff35c974',
-    name: 'Alex Arena',
-    email: 'alex@interval.com',
+    name: 'Ye 001',
+    email: 'ye+001@utilhq.com',
     amount: 15000,
     purchasedAt: new Date(2022, 0, 15),
   },
@@ -13,15 +13,15 @@ const charges = [
   // {
   //   id: 'acc14b04-60d8-4f9d-9907-10ea1ed05fe2',
   //   name: 'Dan Philibin',
-  //   email: 'dan@interval.com',
+  //   email: 'dan@utilhq.com',
   //   amount: 0,
   //   promoCode: 'APPLE',
   //   purchasedAt: new Date(2015, 3, 22),
   // },
   {
     id: '91032195-6836-4573-9cd5-0b06ea2379ec',
-    name: 'Jacob Mischka',
-    email: 'jacob@interval.com',
+    name: 'Ye 002',
+    email: 'ye+002@utilhq.com',
     amount: 1200,
     promoCode: 'BANANA',
     arr: [1, 2, 3],
@@ -29,8 +29,8 @@ const charges = [
   },
   {
     id: '48d10a1a-9c8c-4426-8d0c-796610c652f3',
-    name: 'Ryan Coppolo',
-    email: 'ryan@interval.com',
+    name: 'Ye 003',
+    email: 'ye+003@utilhq.com',
     amount: 2022,
     promoCode: 'ORANGE',
     nested: {
@@ -44,7 +44,7 @@ function formatCurrency(amount: number) {
   return amount.toLocaleString('en-US', { currency: 'usd', style: 'currency' })
 }
 
-export const table_basic: IntervalActionHandler = async io => {
+export const table_basic: UtilHQActionHandler = async io => {
   const simpleCharges = charges.map(ch => ({
     name: ch.name,
     email: faker.internet.email(),
@@ -64,7 +64,7 @@ export const table_basic: IntervalActionHandler = async io => {
   await io.display.object('Selected', { data: selections })
 }
 
-export const table_actions: IntervalActionHandler = async io => {
+export const table_actions: UtilHQActionHandler = async io => {
   const simpleCharges = charges.map((ch, idx) => ({
     id: idx,
     name: ch.name,
@@ -91,7 +91,7 @@ export const table_actions: IntervalActionHandler = async io => {
   await io.display.object('Selected', { data: selections })
 }
 
-export const table_custom: IntervalActionHandler = async io => {
+export const table_custom: UtilHQActionHandler = async io => {
   const options = [
     'id',
     'name',
@@ -198,7 +198,7 @@ export const table_custom: IntervalActionHandler = async io => {
   }
 }
 
-export const table_custom_columns: IntervalActionHandler = async io => {
+export const table_custom_columns: UtilHQActionHandler = async io => {
   type Charge = typeof charges[0]
   const selections = await io.select
     .table('Select from this table', {

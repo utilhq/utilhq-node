@@ -2,7 +2,7 @@ import { z, ZodError } from 'zod'
 import { Evt } from 'evt'
 import type { DuplexMessage } from '../internalRpcSchema'
 import { DUPLEX_MESSAGE_SCHEMA } from '../internalRpcSchema'
-import { sleep } from './IntervalClient'
+import { sleep } from './UtilHQClient'
 import ISocket, { TimeoutError } from './ISocket'
 
 let count = 0
@@ -13,8 +13,8 @@ function generateId() {
 
 export interface MethodDef {
   [key: string]: {
-    inputs: z.ZodFirstPartySchemaTypes | z.ZodDiscriminatedUnion<any, any, any>
-    returns: z.ZodFirstPartySchemaTypes | z.ZodDiscriminatedUnion<any, any, any>
+    inputs: z.ZodFirstPartySchemaTypes | z.ZodDiscriminatedUnion<any, any>
+    returns: z.ZodFirstPartySchemaTypes | z.ZodDiscriminatedUnion<any, any>
   }
 }
 

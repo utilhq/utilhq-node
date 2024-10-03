@@ -1,19 +1,19 @@
 import { Evt } from 'evt'
 import { AccessControlDefinition } from '../internalRpcSchema'
 import {
-  IntervalActionDefinition,
-  IntervalPageHandler,
-  IntervalRouteDefinitions,
+  UtilHQActionDefinition,
+  UtilHQPageHandler,
+  UtilHQRouteDefinitions,
 } from '../types'
 
 export interface PageConfig {
   name: string
   description?: string
   unlisted?: boolean
-  actions?: Record<string, IntervalActionDefinition>
+  actions?: Record<string, UtilHQActionDefinition>
   groups?: Record<string, Page>
-  routes?: IntervalRouteDefinitions
-  handler?: IntervalPageHandler
+  routes?: UtilHQRouteDefinitions
+  handler?: UtilHQPageHandler
   access?: AccessControlDefinition
 }
 
@@ -21,8 +21,8 @@ export default class Page {
   name: string
   description?: string
   unlisted?: boolean
-  routes: IntervalRouteDefinitions
-  handler?: IntervalPageHandler
+  routes: UtilHQRouteDefinitions
+  handler?: UtilHQPageHandler
   access?: AccessControlDefinition
 
   onChange: Evt<void>
@@ -48,7 +48,7 @@ export default class Page {
     }
   }
 
-  add(slug: string, route: IntervalActionDefinition | Page) {
+  add(slug: string, route: UtilHQActionDefinition | Page) {
     this.routes[slug] = route
 
     if (route instanceof Page) {

@@ -28,7 +28,7 @@ import {
 } from '../types'
 import { IOClientRenderReturnValues } from './IOClient'
 import { z, ZodError } from 'zod'
-import IntervalError from './IntervalError'
+import UtilHQError from './UtilHQError'
 
 interface IOPromiseProps<
   MethodName extends T_IO_METHOD_NAMES,
@@ -51,7 +51,7 @@ interface IOPromiseProps<
 /**
  * A custom wrapper class that handles creating the underlying component
  * model when the IO call is to be rendered, and optionally transforming
- * the value received from Interval to a custom component return type.
+ * the value received from utilhq to a custom component return type.
  *
  * Can be `await`ed, which renders its own component by itself,
  * or rendered as a group along with other IOPromises.
@@ -155,7 +155,7 @@ export class DisplayIOPromise<
     MethodName,
     Props,
     ComponentOutput,
-    typeof this,
+    DisplayIOPromise<MethodName, Props, ComponentOutput>,
     Choice
   > {
     return new WithChoicesIOPromise({
@@ -241,7 +241,7 @@ export class InputIOPromise<
     MethodName,
     Props,
     ComponentOutput,
-    typeof this,
+    InputIOPromise<MethodName, Props, ComponentOutput>,
     Choice
   > {
     return new WithChoicesIOPromise({
@@ -387,7 +387,7 @@ export class MultipleableIOPromise<
           .parse(potentialDefaultValue)
       } catch (err) {
         console.error(
-          `[Interval] Invalid default value found for multiple IO call with label "${this.label}": ${defaultValue}. This default value will be ignored.`
+          `[utilhq] Invalid default value found for multiple IO call with label "${this.label}": ${defaultValue}. This default value will be ignored.`
         )
         console.error(err)
         transformedDefaultValue = undefined
@@ -406,17 +406,17 @@ export class MultipleableIOPromise<
   }
 
   withChoices<Choice extends string>(
-    choices: ChoiceButtonConfigOrShorthand<Choice>[]
+    choiceButtons: ChoiceButtonConfigOrShorthand<Choice>[]
   ): WithChoicesIOPromise<
     MethodName,
     Props,
     ComponentOutput,
-    typeof this,
+    MultipleableIOPromise<MethodName, Props, ComponentOutput, DefaultValue>,
     Choice
   > {
     return new WithChoicesIOPromise({
       innerPromise: this,
-      choiceButtons: choices,
+      choiceButtons,
     })
   }
 }
@@ -953,7 +953,7 @@ export class WithChoicesIOPromise<
         Choice
       > {
     if (!(this.innerPromise instanceof InputIOPromise)) {
-      throw new IntervalError(
+      throw new UtilHQError(
         `Invalid chained method call: only input IO methods can be marked as .optional(). Invalid call on the method with label "${this.component.label}".`
       )
     }
@@ -1002,7 +1002,7 @@ export class WithChoicesIOPromise<
     Choice
   > {
     if (!(this.innerPromise instanceof MultipleableIOPromise)) {
-      throw new IntervalError(
+      throw new UtilHQError(
         `Invalid chained method call: .multiple() is not allowed on the IO method with label "${this.component.label}".`
       )
     }
@@ -1015,15 +1015,15 @@ export class WithChoicesIOPromise<
     })
   }
 
-  withChoices<Choice extends string>(
-    choices: ChoiceButtonConfigOrShorthand<Choice>[]
-  ) {
+  withChoices<NewChoice extends string>(
+    choices: ChoiceButtonConfigOrShorthand<NewChoice>[]
+  ): WithChoicesIOPromise<MethodName, Props, ComponentOutput, InnerPromise, NewChoice> {
     return new WithChoicesIOPromise<
       MethodName,
       Props,
       ComponentOutput,
       InnerPromise,
-      Choice
+      NewChoice
     >({
       innerPromise: this.innerPromise,
       choiceButtons: choices,
@@ -1239,11 +1239,11 @@ export class IOGroupPromise<
 
   withChoices<Choice extends string>(
     choices: ChoiceButtonConfigOrShorthand<Choice>[]
-  ): WithChoicesIOGroupPromise<IOPromises, ReturnValues, typeof this, Choice> {
+  ): WithChoicesIOGroupPromise<IOPromises, ReturnValues, IOGroupPromise<IOPromises, ReturnValues>, Choice> {
     return new WithChoicesIOGroupPromise<
       IOPromises,
       ReturnValues,
-      typeof this,
+      IOGroupPromise<IOPromises, ReturnValues>,
       Choice
     >({
       innerPromise: this,
@@ -1375,3 +1375,4 @@ export class WithChoicesIOGroupPromise<
     })
   }
 }
+

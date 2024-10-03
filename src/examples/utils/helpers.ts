@@ -34,7 +34,7 @@ export function mapToSelectOption(inputUser: {
   }
 }
 
-export function mapToIntervalUser(inputUser: {
+export function mapToUtilHQUser(inputUser: {
   first_name: string
   last_name: string
   email: string

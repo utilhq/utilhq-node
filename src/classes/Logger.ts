@@ -11,7 +11,7 @@ export type LogLevel =
   | 'prod' /* @deprecated, alias for 'info' */
   | 'debug'
 
-export const CHANGELOG_URL = 'https://interval.com/changelog'
+export const CHANGELOG_URL = 'https://utilhq.com/changelog'
 
 export default class Logger {
   logLevel: LogLevel = 'info'
@@ -24,27 +24,27 @@ export default class Logger {
 
   /* Important messages, always emitted */
   prod(...args: any[]) {
-    console.log('[Interval] ', ...args)
+    console.log('[utilhq] ', ...args)
   }
 
-  /* Same as prod, but without the [Interval] prefix */
+  /* Same as prod, but without the [utilhq] prefix */
   prodNoPrefix(...args: any[]) {
     console.log(...args)
   }
 
   /* Fatal errors or errors in user code, always emitted */
   error(...args: any[]) {
-    console.error('[Interval] ', ...args)
+    console.error('[utilhq] ', ...args)
   }
 
   /* Informational messages, not emitted in "quiet" logLevel */
   info(...args: any[]) {
     if (this.logLevel !== 'quiet') {
-      console.info('[Interval] ', ...args)
+      console.info('[utilhq] ', ...args)
     }
   }
 
-  /* Same as info, but without the [Interval] prefix */
+  /* Same as info, but without the [utilhq] prefix */
   infoNoPrefix(...args: any[]) {
     if (this.logLevel !== 'quiet') {
       console.log(...args)
@@ -54,14 +54,14 @@ export default class Logger {
   /* Non-fatal warnings, not emitted in "quiet" logLevel */
   warn(...args: any[]) {
     if (this.logLevel !== 'quiet') {
-      console.warn('[Interval] ', ...args)
+      console.warn('[utilhq] ', ...args)
     }
   }
 
   /* Debugging/tracing information, only emitted in "debug" logLevel */
   debug(...args: any[]) {
     if (this.logLevel === 'debug') {
-      console.debug('[Interval] ', ...args)
+      console.debug('[utilhq] ', ...args)
     }
   }
 
@@ -75,14 +75,14 @@ export default class Logger {
 
     switch (severity) {
       case 'INFO':
-        this.info('🆕\tA new Interval SDK version is available.')
+        this.info('🆕\tA new utilhq SDK version is available.')
         if (message) {
           this.info(message)
         }
         break
       case 'WARNING':
         this.warn(
-          `${WARN_EMOJI}\tThis version of the Interval SDK has been deprecated. Please update as soon as possible, it will not work in a future update.`
+          `${WARN_EMOJI}\tThis version of the utilhq SDK has been deprecated. Please update as soon as possible, it will not work in a future update.`
         )
         if (message) {
           this.warn(message)
@@ -90,7 +90,7 @@ export default class Logger {
         break
       case 'ERROR':
         this.error(
-          `${ERROR_EMOJI}\tThis version of the Interval SDK is no longer supported. Your app will not work until you update.`
+          `${ERROR_EMOJI}\tThis version of the utilhq SDK is no longer supported. Your app will not work until you update.`
         )
         if (message) {
           this.error(message)

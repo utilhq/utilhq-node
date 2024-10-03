@@ -1,7 +1,7 @@
-import Interval from '../../index'
+import UtilHQ from '../../index'
 import env from '../../env'
 
-const interval = new Interval({
+const utilhq = new UtilHQ({
   apiKey: env.DEMO_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:3000/websocket',
@@ -20,21 +20,21 @@ const interval = new Interval({
   },
 })
 
-interval.listen()
+utilhq.listen()
 
 setTimeout(async () => {
-  await interval.enqueue('helloCurrentUser', {
-    assignee: 'alex@interval.com',
+  await utilhq.enqueue('helloCurrentUser', {
+    assignee: 'ye@utilhq.com',
     params: {
       message: 'Hello, queue!',
     },
   })
 
-  const queuedAction = await interval.enqueue('helloCurrentUser', {
+  const queuedAction = await utilhq.enqueue('helloCurrentUser', {
     params: {
       message: 'Hello, anyone!',
     },
   })
 
-  await interval.dequeue(queuedAction.id)
+  await utilhq.dequeue(queuedAction.id)
 }, 1000)

@@ -40,17 +40,17 @@ import { deserializeDates } from '../utils/deserialize'
 import type {
   ActionCtx,
   PageCtx,
-  IntervalActionHandler,
-  IntervalActionStore,
-  IntervalPageStore,
+  UtilHQActionHandler,
+  UtilHQActionStore,
+  UtilHQPageStore,
   InternalButtonItem,
   PageError,
-  IntervalRouteDefinitions,
-  IntervalPageHandler,
-  IntervalErrorHandler,
+  UtilHQRouteDefinitions,
+  UtilHQPageHandler,
+  UtilHQErrorHandler,
 } from '../types'
 import TransactionLoadingState from './TransactionLoadingState'
-import { Interval, InternalConfig, IntervalError } from '..'
+import { UtilHQ, InternalConfig, UtilHQError } from '..'
 import Page from './Page'
 import Action from './Action'
 import {
@@ -61,8 +61,8 @@ import {
 } from './Layout'
 
 import type { AsyncLocalStorage } from 'async_hooks'
-let actionLocalStorage: AsyncLocalStorage<IntervalActionStore> | undefined
-let pageLocalStorage: AsyncLocalStorage<IntervalPageStore> | undefined
+let actionLocalStorage: AsyncLocalStorage<UtilHQActionStore> | undefined
+let pageLocalStorage: AsyncLocalStorage<UtilHQPageStore> | undefined
 
 async function initAsyncLocalStorage() {
   try {
@@ -70,8 +70,8 @@ async function initAsyncLocalStorage() {
       const {
         default: { AsyncLocalStorage },
       } = await import('async_hooks')
-      actionLocalStorage = new AsyncLocalStorage<IntervalActionStore>()
-      pageLocalStorage = new AsyncLocalStorage<IntervalPageStore>()
+      actionLocalStorage = new AsyncLocalStorage<UtilHQActionStore>()
+      pageLocalStorage = new AsyncLocalStorage<UtilHQPageStore>()
     }
   } catch (err) {
     console.error('Failed initializing AsyncLocalStorage stores')
@@ -98,8 +98,8 @@ interface SetupConfig {
   instanceId?: string
 }
 
-export default class IntervalClient {
-  #interval: Interval
+export default class UtilHQClient {
+  #utilhq: UtilHQ
   #apiKey: string | undefined
   #endpoint: string
   #httpEndpoint: string
@@ -119,8 +119,8 @@ export default class IntervalClient {
   #routes: Map<string, Action | Page> = new Map()
   #actionDefinitions: ActionDefinition[] = []
   #pageDefinitions: PageDefinition[] = []
-  #actionHandlers: Map<string, IntervalActionHandler> = new Map()
-  #pageHandlers: Map<string, IntervalPageHandler> = new Map()
+  #actionHandlers: Map<string, UtilHQActionHandler> = new Map()
+  #pageHandlers: Map<string, UtilHQPageHandler> = new Map()
 
   organization:
     | {
@@ -131,10 +131,10 @@ export default class IntervalClient {
   environment: ActionEnvironment | undefined
 
   #verboseMessageLogs = false
-  #onError: IntervalErrorHandler | undefined
+  #onError: UtilHQErrorHandler | undefined
 
-  constructor(interval: Interval, config: InternalConfig) {
-    this.#interval = interval
+  constructor(utilhq: UtilHQ, config: InternalConfig) {
+    this.#utilhq = utilhq
     this.#apiKey = config.apiKey
     this.#logger = new Logger(config.logLevel)
     this.#config = config
@@ -194,8 +194,8 @@ export default class IntervalClient {
 
     const pageDefinitions: PageDefinition[] = []
     const actionDefinitions: (ActionDefinition & { handler: undefined })[] = []
-    const actionHandlers = new Map<string, IntervalActionHandler>()
-    const pageHandlers = new Map<string, IntervalPageHandler>()
+    const actionHandlers = new Map<string, UtilHQActionHandler>()
+    const pageHandlers = new Map<string, UtilHQPageHandler>()
 
     function walkRouter(groupSlug: string, page: Page) {
       routes.set(groupSlug, page)
@@ -236,7 +236,7 @@ export default class IntervalClient {
       }
     }
 
-    let fileSystemRoutes: IntervalRouteDefinitions | undefined
+    let fileSystemRoutes: UtilHQRouteDefinitions | undefined
 
     if (typeof window === 'undefined' && this.#config.routesDirectory) {
       try {
@@ -413,7 +413,7 @@ export default class IntervalClient {
     const response = await this.#send('BEGIN_HOST_SHUTDOWN', {})
 
     if (response.type === 'error') {
-      throw new IntervalError(
+      throw new UtilHQError(
         response.message ?? 'Unknown error sending shutdown request.'
       )
     }
@@ -456,11 +456,11 @@ export default class IntervalClient {
       .then(r => DECLARE_HOST.returns.parseAsync(r))
       .catch(err => {
         this.#logger.debug(err)
-        throw new IntervalError('Received invalid API response.')
+        throw new UtilHQError('Received invalid API response.')
       })
 
     if (response.type === 'error') {
-      throw new IntervalError(
+      throw new UtilHQError(
         `There was a problem declaring the host: ${response.message}`
       )
     }
@@ -476,7 +476,7 @@ export default class IntervalClient {
     }
 
     if (response.invalidSlugs.length > 0) {
-      this.#log.warn('[Interval]', '⚠ Invalid slugs detected:\n')
+      this.#log.warn('[utilhq]', '⚠ Invalid slugs detected:\n')
 
       for (const slug of response.invalidSlugs) {
         this.#log.warn(`  - ${slug}`)
@@ -487,7 +487,7 @@ export default class IntervalClient {
       )
 
       if (response.invalidSlugs.length === this.#actionDefinitions.length) {
-        throw new IntervalError('No valid slugs provided')
+        throw new UtilHQError('No valid slugs provided')
       }
     }
   }
@@ -707,7 +707,7 @@ export default class IntervalClient {
   }
 
   /**
-   * Establishes the underlying ISocket connection to Interval.
+   * Establishes the underlying ISocket connection to utilhq.
    */
   async #createSocketConnection(connectConfig?: SetupConfig) {
     const id = connectConfig?.instanceId ?? v4()
@@ -750,7 +750,7 @@ export default class IntervalClient {
       // don't initialize retry process again if already started
       if (this.#isReconnecting) return
 
-      this.#log.error(`❗ Connection to Interval closed (code ${code})`)
+      this.#log.error(`❗ Connection to utilhq closed (code ${code})`)
 
       if (reason) {
         this.#log.error('Reason:', reason)
@@ -816,7 +816,7 @@ export default class IntervalClient {
           this.#logger.warn(
             `No pong received in last ${
               this.#closeUnresponsiveConnectionTimeoutMs
-            }ms, closing connection to Interval and retrying...`
+            }ms, closing connection to utilhq and retrying...`
           )
           if (this.#pingIntervalHandle) {
             clearInterval(this.#pingIntervalHandle)
@@ -843,7 +843,7 @@ export default class IntervalClient {
   }
 
   #createRPCHandlers(requestId?: string): DuplexRPCHandlers<HostSchema> {
-    const intervalClient = this
+    const utilhqClient = this
     return {
       START_TRANSACTION: async inputs => {
         if (this.#resolveShutdown) {
@@ -853,8 +853,8 @@ export default class IntervalClient {
           return
         }
 
-        if (!intervalClient.organization) {
-          intervalClient.#log.error('No organization defined')
+        if (!utilhqClient.organization) {
+          utilhqClient.#log.error('No organization defined')
           return
         }
 
@@ -865,20 +865,20 @@ export default class IntervalClient {
           return
         }
 
-        const actionHandler = intervalClient.#actionHandlers.get(action.slug)
+        const actionHandler = utilhqClient.#actionHandlers.get(action.slug)
 
-        intervalClient.#log.debug(actionHandler)
+        utilhqClient.#log.debug(actionHandler)
 
         if (!actionHandler) {
-          intervalClient.#log.debug('No actionHandler called', action.slug)
+          utilhqClient.#log.debug('No actionHandler called', action.slug)
           return
         }
 
         const client = new IOClient({
-          logger: intervalClient.#logger,
+          logger: utilhqClient.#logger,
           send: async ioRenderInstruction => {
             const ioCall = JSON.stringify(ioRenderInstruction)
-            intervalClient.#pendingIOCalls.set(transactionId, ioCall)
+            utilhqClient.#pendingIOCalls.set(transactionId, ioCall)
 
             if (this.#config.getClientHandlers) {
               await this.#config.getClientHandlers()?.RENDER({
@@ -886,7 +886,7 @@ export default class IntervalClient {
                 toRender: ioCall,
               })
             } else {
-              const response = await intervalClient.#send('SEND_IO_CALL', {
+              const response = await utilhqClient.#send('SEND_IO_CALL', {
                 transactionId,
                 ioCall,
               })
@@ -907,18 +907,18 @@ export default class IntervalClient {
               }
             }
 
-            intervalClient.#transactionLoadingStates.delete(transactionId)
+            utilhqClient.#transactionLoadingStates.delete(transactionId)
           },
           isDemo: !!this.#config.getClientHandlers,
           displayResolvesImmediately: inputs.displayResolvesImmediately,
           // onAddInlineAction: handler => {
           //   const key = v4()
-          //   intervalClient.#actionHandlers.set(key, handler)
+          //   utilhqClient.#actionHandlers.set(key, handler)
           //   return key
           // },
         })
 
-        intervalClient.#ioResponseHandlers.set(
+        utilhqClient.#ioResponseHandlers.set(
           transactionId,
           client.onResponse.bind(client)
         )
@@ -939,20 +939,20 @@ export default class IntervalClient {
           // TODO: Remove this when all active SDKs support superjson
           params: deserializeDates(params),
           environment: inputs.environment,
-          organization: intervalClient.organization,
+          organization: utilhqClient.organization,
           action,
           log: (...args) =>
-            intervalClient.#sendLog(transactionId, logIndex++, ...args),
+            utilhqClient.#sendLog(transactionId, logIndex++, ...args),
           notify: async config => {
-            await intervalClient.#interval.notify({
+            await utilhqClient.#utilhq.notify({
               ...config,
               transactionId: inputs.transactionId,
             })
           },
           loading: new TransactionLoadingState({
-            logger: intervalClient.#logger,
+            logger: utilhqClient.#logger,
             send: async loadingState => {
-              intervalClient.#transactionLoadingStates.set(
+              utilhqClient.#transactionLoadingStates.set(
                 transactionId,
                 loadingState
               )
@@ -962,7 +962,7 @@ export default class IntervalClient {
                   ...loadingState,
                 })
               } else {
-                await intervalClient.#send('SEND_LOADING_CALL', {
+                await utilhqClient.#send('SEND_LOADING_CALL', {
                   transactionId,
                   ...loadingState,
                 })
@@ -970,7 +970,7 @@ export default class IntervalClient {
             },
           }),
           redirect: (props: LegacyLinkProps) =>
-            intervalClient.#sendRedirect(transactionId, props),
+            utilhqClient.#sendRedirect(transactionId, props),
         }
 
         this.#ioClients.set(transactionId, client)
@@ -995,7 +995,7 @@ export default class IntervalClient {
               // Action did not catch the cancellation error
               if (err instanceof IOError && err.kind === 'CANCELED') throw err
 
-              intervalClient.#logger.error(err)
+              utilhqClient.#logger.error(err)
 
               let data: IOFunctionReturnType = null
               if (err instanceof IOError && err.cause) {
@@ -1041,7 +1041,7 @@ export default class IntervalClient {
                   result: JSON.stringify(res),
                 })
               } else {
-                await intervalClient.#send('MARK_TRANSACTION_COMPLETE', {
+                await utilhqClient.#send('MARK_TRANSACTION_COMPLETE', {
                   transactionId,
                   resultStatus: res.status,
                   result: JSON.stringify(res),
@@ -1051,12 +1051,12 @@ export default class IntervalClient {
               if (requestId) {
                 setTimeout(() => {
                   const callbacks =
-                    intervalClient.#httpRequestCompleteCallbacks.get(requestId)
+                    utilhqClient.#httpRequestCompleteCallbacks.get(requestId)
                   if (callbacks) {
                     const [resolve] = callbacks
                     resolve()
                   } else {
-                    intervalClient.#log.debug(
+                    utilhqClient.#log.debug(
                       'No HTTP request complete callbacks found for requestId',
                       requestId
                     )
@@ -1068,31 +1068,31 @@ export default class IntervalClient {
               if (err instanceof IOError) {
                 switch (err.kind) {
                   case 'CANCELED':
-                    intervalClient.#log.debug(
+                    utilhqClient.#log.debug(
                       'Transaction canceled for action',
                       action.slug
                     )
                     break
                   case 'TRANSACTION_CLOSED':
-                    intervalClient.#log.debug(
+                    utilhqClient.#log.debug(
                       'Attempted to make IO call after transaction already closed in action',
                       action.slug
                     )
                     break
                 }
               } else {
-                intervalClient.#log.error('Error sending action response', err)
+                utilhqClient.#log.error('Error sending action response', err)
               }
 
               if (requestId) {
                 setTimeout(() => {
                   const callbacks =
-                    intervalClient.#httpRequestCompleteCallbacks.get(requestId)
+                    utilhqClient.#httpRequestCompleteCallbacks.get(requestId)
                   if (callbacks) {
                     const [_, reject] = callbacks
                     reject(err)
                   } else {
-                    intervalClient.#log.debug(
+                    utilhqClient.#log.debug(
                       'No HTTP request complete callbacks found for requestId',
                       requestId
                     )
@@ -1155,16 +1155,16 @@ export default class IntervalClient {
         if (!this.organization) {
           this.#log.error('No organization defined')
 
-          const error = new IntervalError('No organization defined.')
+          const error = new UtilHQError('No organization defined.')
           if (requestId) {
             setTimeout(() => {
               const callbacks =
-                intervalClient.#httpRequestCompleteCallbacks.get(requestId)
+                utilhqClient.#httpRequestCompleteCallbacks.get(requestId)
               if (callbacks) {
                 const [_, reject] = callbacks
                 reject(error)
               } else {
-                intervalClient.#log.debug(
+                utilhqClient.#log.debug(
                   'No HTTP request complete callbacks found for requestId',
                   requestId
                 )
@@ -1181,16 +1181,16 @@ export default class IntervalClient {
         if (!pageHandler) {
           this.#log.debug('No page handler found', inputs.page.slug)
 
-          const error = new IntervalError('No page handler found.')
+          const error = new UtilHQError('No page handler found.')
           if (requestId) {
             setTimeout(() => {
               const callbacks =
-                intervalClient.#httpRequestCompleteCallbacks.get(requestId)
+                utilhqClient.#httpRequestCompleteCallbacks.get(requestId)
               if (callbacks) {
                 const [_, reject] = callbacks
                 reject(error)
               } else {
-                intervalClient.#log.debug(
+                utilhqClient.#log.debug(
                   'No HTTP request complete callbacks found for requestId',
                   requestId
                 )
@@ -1218,12 +1218,12 @@ export default class IntervalClient {
           organization: this.organization,
           page: inputs.page,
           redirect: (props: LegacyLinkProps) =>
-            intervalClient.#sendRedirect(pageKey, props),
+            utilhqClient.#sendRedirect(pageKey, props),
           loading: new TransactionLoadingState({
-            logger: intervalClient.#logger,
+            logger: utilhqClient.#logger,
             send: async loadingState => {
               if (!this.#openPages.has(pageKey)) return
-              intervalClient.#transactionLoadingStates.set(
+              utilhqClient.#transactionLoadingStates.set(
                 pageKey,
                 loadingState
               )
@@ -1233,7 +1233,7 @@ export default class IntervalClient {
                   ...loadingState,
                 })
               } else {
-                await intervalClient.#send('SEND_LOADING_CALL', {
+                await utilhqClient.#send('SEND_LOADING_CALL', {
                   transactionId: pageKey,
                   ...loadingState,
                 })
@@ -1303,7 +1303,7 @@ export default class IntervalClient {
                 await sleep(this.#retryIntervalMs)
               }
             }
-            throw new IntervalError(
+            throw new UtilHQError(
               'Unsuccessful sending page, max retries exceeded.'
             )
           }
@@ -1619,12 +1619,12 @@ export default class IntervalClient {
         if (requestId) {
           setTimeout(() => {
             const callbacks =
-              intervalClient.#httpRequestCompleteCallbacks.get(requestId)
+              utilhqClient.#httpRequestCompleteCallbacks.get(requestId)
             if (callbacks) {
               const [resolve] = callbacks
               resolve()
             } else {
-              intervalClient.#log.debug(
+              utilhqClient.#log.debug(
                 'No HTTP request complete callbacks found for requestId',
                 requestId
               )
@@ -1643,7 +1643,7 @@ export default class IntervalClient {
 
   /**
    * Creates the DuplexRPCClient responsible for sending
-   * messages to Interval.
+   * messages to utilhq.
    */
   #createRPCClient<CallerSchema extends MethodDef>({
     communicator = this.#ws,
@@ -1668,16 +1668,16 @@ export default class IntervalClient {
   }
 
   /**
-   * Sends the `INITIALIZE_HOST` RPC call to Interval,
+   * Sends the `INITIALIZE_HOST` RPC call to utilhq,
    * declaring the actions that this host is responsible for handling.
    */
   async #initializeHost(requestId?: string) {
     if (!this.#ws) {
-      throw new IntervalError('ISocket not initialized')
+      throw new UtilHQError('ISocket not initialized')
     }
 
     if (!this.#serverRpc) {
-      throw new IntervalError('serverRpc not initialized')
+      throw new UtilHQError('serverRpc not initialized')
     }
 
     const isInitialInitialization = !this.#isInitialized
@@ -1695,7 +1695,7 @@ export default class IntervalClient {
     })
 
     if (!response) {
-      throw new IntervalError('Unknown error')
+      throw new UtilHQError('Unknown error')
     }
 
     if (response.sdkAlert) {
@@ -1703,10 +1703,10 @@ export default class IntervalClient {
     }
 
     if (response.type === 'error') {
-      throw new IntervalError(response.message)
+      throw new UtilHQError(response.message)
     } else {
       if (response.invalidSlugs.length > 0) {
-        this.#log.warn('[Interval]', '⚠ Invalid slugs detected:\n')
+        this.#log.warn('[utilhq]', '⚠ Invalid slugs detected:\n')
 
         for (const slug of response.invalidSlugs) {
           this.#log.warn(`  - ${slug}`)
@@ -1741,7 +1741,7 @@ export default class IntervalClient {
     methodName: MethodName,
     inputs: z.input<WSServerSchema[MethodName]['inputs']>
   ) {
-    if (!this.#serverRpc) throw new IntervalError('serverRpc not initialized')
+    if (!this.#serverRpc) throw new UtilHQError('serverRpc not initialized')
 
     for (
       let attemptNumber = 1;
@@ -1770,7 +1770,7 @@ export default class IntervalClient {
       }
     }
 
-    throw new IntervalError('Maximum failed resend attempts reached, aborting.')
+    throw new UtilHQError('Maximum failed resend attempts reached, aborting.')
   }
 
   /**
@@ -1778,7 +1778,7 @@ export default class IntervalClient {
    * Do not use unless you're absolutely sure what you're doing.
    */
   protected async __dangerousInternalSend(methodName: any, inputs: any) {
-    if (!this.#serverRpc) throw new IntervalError('serverRpc not initialized')
+    if (!this.#serverRpc) throw new UtilHQError('serverRpc not initialized')
 
     return await this.#serverRpc.send(methodName, inputs)
   }
@@ -1815,14 +1815,14 @@ export default class IntervalClient {
         index,
         timestamp: new Date().valueOf(),
       }).catch(err => {
-        this.#logger.error('Failed sending log to Interval', err)
+        this.#logger.error('Failed sending log to utilhq', err)
       })
     }
   }
 
   async #sendRedirect(transactionId: string, props: LegacyLinkProps) {
     if (this.#config.getClientHandlers) {
-      throw new IntervalError(
+      throw new UtilHQError(
         `The ctx.redirect method isn't supported in demo mode`
       )
     }
@@ -1833,7 +1833,7 @@ export default class IntervalClient {
     })
 
     if (!response) {
-      throw new IntervalError('Failed sending redirect')
+      throw new UtilHQError('Failed sending redirect')
     }
   }
 }

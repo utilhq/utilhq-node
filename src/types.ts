@@ -104,7 +104,7 @@ export type ActionCtx = {
    */
   loading: TransactionLoadingState
   /**
-   * Logs anything from your action by printing a message in the Interval dashboard. Works with multiple arguments like JavaScript’s console.log. Logs are truncated at 10,000 characters.
+   * Logs anything from your action by printing a message in the utilhq dashboard. Works with multiple arguments like JavaScript’s console.log. Logs are truncated at 10,000 characters.
    *
    * **Usage:**
    *
@@ -114,7 +114,7 @@ export type ActionCtx = {
    */
   log: ActionLogFn
   /**
-   * Sends a custom notification to Interval users via email or Slack. To send Slack notifications, you'll need to connect your Slack workspace to the Interval app in your organization settings.
+   * Sends a custom notification to utilhq users via email or Slack. To send Slack notifications, you'll need to connect your Slack workspace to the utilhq app in your organization settings.
    *
    * **Usage:**
    *
@@ -124,7 +124,7 @@ export type ActionCtx = {
    *   title: "Refund over threshold",
    *   delivery: [
    *     {
-   *       to: "#interval-notifications",
+   *       to: "#utilhq-notifications",
    *       method: "SLACK",
    *     },
    *     {
@@ -185,23 +185,23 @@ export type PageCtx = Pick<
 
 export type IO = IOClient['io']
 
-export type IntervalActionHandler = (
+export type UtilHQActionHandler = (
   io: IO,
   ctx: ActionCtx
 ) => Promise<IOFunctionReturnType | void>
 
-export interface IntervalActionStore {
+export interface UtilHQActionStore {
   io: IO
   ctx: ActionCtx
 }
 
-export interface IntervalPageStore {
+export interface UtilHQPageStore {
   display: IO['display']
   ctx: PageCtx
 }
 
-export interface ExplicitIntervalActionDefinition {
-  handler: IntervalActionHandler
+export interface ExplicitUtilHQActionDefinition {
+  handler: UtilHQActionHandler
   backgroundable?: boolean
   unlisted?: boolean
   warnOnClose?: boolean
@@ -210,17 +210,17 @@ export interface ExplicitIntervalActionDefinition {
   access?: AccessControlDefinition
 }
 
-export type IntervalActionDefinition =
-  | IntervalActionHandler
-  | ExplicitIntervalActionDefinition
+export type UtilHQActionDefinition =
+  | UtilHQActionHandler
+  | ExplicitUtilHQActionDefinition
   | Action
 
-export type IntervalRouteDefinitions = Record<
+export type UtilHQRouteDefinitions = Record<
   string,
-  IntervalActionDefinition | Page
+  UtilHQActionDefinition | Page
 >
 
-export type IntervalPageHandler = (
+export type UtilHQPageHandler = (
   display: IO['display'],
   ctx: PageCtx
 ) => Promise<Layout | undefined>
@@ -558,7 +558,7 @@ export type PageError = {
   layoutKey?: keyof BasicLayoutConfig
 }
 
-export type IntervalErrorProps = {
+export type UtilHQErrorProps = {
   error: Error | unknown
   route: string
   routeDefinition: Action | Page | undefined
@@ -568,6 +568,6 @@ export type IntervalErrorProps = {
   organization: CtxOrganization
 }
 
-export type IntervalErrorHandler = (props: IntervalErrorProps) => void
+export type UtilHQErrorHandler = (props: UtilHQErrorProps) => void
 
 export type EventualValue<T> = T | Promise<T> | (() => T) | (() => Promise<T>)

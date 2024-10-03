@@ -1,5 +1,5 @@
 import { T_IO_PROPS, ImageSize } from '../ioSchema'
-import { IntervalError } from '..'
+import { UtilHQError } from '..'
 
 const MAX_BUFFER_SIZE_MB = 50
 
@@ -26,7 +26,7 @@ export default function displayVideo(
 
   if ('buffer' in props) {
     if (Buffer.byteLength(props.buffer) > MAX_BUFFER_SIZE_MB * 1000 * 1000) {
-      throw new IntervalError(
+      throw new UtilHQError(
         `Buffer for io.display.video is too large, must be under ${MAX_BUFFER_SIZE_MB} MB`
       )
     }

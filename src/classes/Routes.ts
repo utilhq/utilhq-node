@@ -1,25 +1,25 @@
 import Logger from './Logger'
-import Interval, { IntervalActionDefinition, Page, QueuedAction } from '..'
+import UtilHQ, { UtilHQActionDefinition, Page, QueuedAction } from '..'
 import { Ctx } from 'evt'
 
 /**
- * This is effectively a namespace inside of Interval with a little bit of its own state.
+ * This is effectively a namespace inside of utilhq with a little bit of its own state.
  */
 export default class Routes {
-  protected interval: Interval
+  protected utilhq: UtilHQ
   #logger: Logger
   #apiKey?: string
   #endpoint: string
   #groupChangeCtx: Ctx<void>
 
   constructor(
-    interval: Interval,
+    utilhq: UtilHQ,
     endpoint: string,
     logger: Logger,
     ctx: Ctx<void>,
     apiKey?: string
   ) {
-    this.interval = interval
+    this.utilhq = utilhq
     this.#apiKey = apiKey
     this.#logger = logger
     this.#endpoint = endpoint + '/api/actions'
@@ -27,40 +27,40 @@ export default class Routes {
   }
 
   /**
-   * @deprecated Use `interval.enqueue()` instead.
+   * @deprecated Use `utilhq.enqueue()` instead.
    */
   async enqueue(
     slug: string,
     args: Pick<QueuedAction, 'assignee' | 'params'> = {}
   ): Promise<QueuedAction> {
-    return this.interval.enqueue(slug, args)
+    return this.utilhq.enqueue(slug, args)
   }
 
   /**
-   * @deprecated Use `interval.dequeue()` instead.
+   * @deprecated Use `utilhq.dequeue()` instead.
    */
   async dequeue(id: string): Promise<QueuedAction> {
-    return this.interval.dequeue(id)
+    return this.utilhq.dequeue(id)
   }
 
-  add(slug: string, route: IntervalActionDefinition | Page) {
-    if (!this.interval.config.routes) {
-      this.interval.config.routes = {}
+  add(slug: string, route: UtilHQActionDefinition | Page) {
+    if (!this.utilhq.config.routes) {
+      this.utilhq.config.routes = {}
     }
 
     if (route instanceof Page) {
       route.onChange.attach(this.#groupChangeCtx, () => {
-        this.interval.client?.handleActionsChange(this.interval.config)
+        this.utilhq.client?.handleActionsChange(this.utilhq.config)
       })
     }
 
-    this.interval.config.routes[slug] = route
-    this.interval.client?.handleActionsChange(this.interval.config)
+    this.utilhq.config.routes[slug] = route
+    this.utilhq.client?.handleActionsChange(this.utilhq.config)
   }
 
   remove(slug: string) {
     for (const key of ['routes', 'actions', 'groups'] as const) {
-      const routes = this.interval.config[key]
+      const routes = this.utilhq.config[key]
 
       if (!routes) continue
       const route = routes[slug]
@@ -72,7 +72,7 @@ export default class Routes {
 
       delete routes[slug]
 
-      this.interval.client?.handleActionsChange(this.interval.config)
+      this.utilhq.client?.handleActionsChange(this.utilhq.config)
       return
     }
   }

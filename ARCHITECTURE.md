@@ -1,23 +1,25 @@
-# Interval JS SDK
+# utilhq JS SDK
 
-The Interval SDK consists of several high-level actors responsible
-for handling communication between the defined actions and Interval.
+The utilhq SDK is a fork of [@interval/interval-node](https://github.com/interval/interval-node)
+and intended to be a drop-in replacement. The utilhq SDK consists of
+several high-level actors responsible for handling communication between
+the defined actions and utilhq.
 
 ## Architecture
 
 What follows is a high-level overview of how the underlying actors interact
-with each other and with Interval.
+with each other and with utilhq.
 
-### `Interval`
+### `utilhq`
 
-The default export `Interval` class is the entrypoint to connecting
-to Interval. Upon calling `listen()`, the `Interval` class does the
+The default export `utilhq` class is the entrypoint to connecting
+to utilhq. Upon calling `listen()`, the `utilhq` class does the
 following:
 
-1. Establishes an `ISocket` connection to Interval
+1. Establishes an `ISocket` connection to utilhq
 2. Creates a `DuplexRPCClient`, defining methods for sending
-   and responding to high-level RPC messages from Interval.
-3. Sends the `INITIALIZE_HOST` RPC message to Interval,
+   and responding to high-level RPC messages from utilhq.
+3. Sends the `INITIALIZE_HOST` RPC message to utilhq,
    letting it know what actions this host is defining
    and the handlers to call when those actions are run.
 
@@ -58,15 +60,15 @@ The `IOClient` defines the internal `renderComponents` method, which
 handles the render loop for a given IO call.
 Given a list of `IOComponent`s (potentially only one if not rendering a group)
 this method is responsible for sending the initial render call and handling
-responses (returns, state updates, or cancellations) from Interval.
+responses (returns, state updates, or cancellations) from utilhq.
 Resolves when each `IOComponent`'s `returnValue` Promise is resolved via
-response from Interval, or throws an IOError of kind `CANCELED` if canceled.
+response from utilhq, or throws an IOError of kind `CANCELED` if canceled.
 
 ### `IOPromise`
 
 A custom wrapper class that handles creating the underlying component
 model when the IO call is to be rendered, and optionally transforming
-the value received from Interval to a custom component return type.
+the value received from utilhq to a custom component return type.
 A relatively thin wrapper around the internal `IOComponent` which is primarily
 responsible for being `await`able and transforming the network-level
 props and return values to the values expected by the IO method caller.
@@ -76,7 +78,7 @@ is resolved.
 ### `IOComponent`
 
 The internal model underlying each `IOPromise`, responsible for constructing
-the data transmitted to Interval for an IO component, and handling responses
-received from Interval for the current component: resolving its `returnValue`
+the data transmitted to utilhq for an IO component, and handling responses
+received from utilhq for the current component: resolving its `returnValue`
 when receiving a final response from the action runner, or constructing a new
 set of props when receiving new state.

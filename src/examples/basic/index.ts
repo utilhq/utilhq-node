@@ -1,14 +1,14 @@
-import Interval, { IOError, io, ctx, Action, Page, Layout } from '../../index'
-import IntervalClient from '../../classes/IntervalClient'
+import UtilHQ, { IOError, io, ctx, Action, Page, Layout } from '../../index'
+import UtilHQClient from '../../classes/UtilHQClient'
 import {
-  IntervalActionDefinition,
-  IntervalActionHandler,
+  UtilHQActionDefinition,
+  UtilHQActionHandler,
   NotificationDeliveryInstruction,
 } from '../../types'
 import editEmailForUser from './editEmail'
 import {
   fakeDb,
-  mapToIntervalUser,
+  mapToUtilHQUser,
   sleep,
   generateRows,
 } from '../utils/helpers'
@@ -179,7 +179,7 @@ const confirmIdentity = new Action({
   },
 })
 
-const actionLinks: IntervalActionHandler = async () => {
+const actionLinks: UtilHQActionHandler = async () => {
   await io.group([
     io.display.table('In a table!', {
       data: [
@@ -253,7 +253,7 @@ const redirect_page_test = new Page({
   },
 })
 
-const prod = new Interval({
+const prod = new UtilHQ({
   apiKey: env.DEMO_PROD_API_KEY,
   endpoint: 'ws://localhost:8000/websocket',
   logLevel: 'debug',
@@ -359,7 +359,7 @@ const prod = new Interval({
         const name = await io.input.text('Enter the name for a user')
         return { name }
       },
-    } as IntervalActionDefinition,
+    } as UtilHQActionDefinition,
     enter_two_numbers: new Action({
       handler: async io => {
         const num1 = await io.input.number('Enter a number')
@@ -559,7 +559,7 @@ const prod = new Interval({
 
 prod.listen()
 
-const interval = new Interval({
+const utilhq = new UtilHQ({
   apiKey: env.DEMO_API_KEY,
   logLevel: 'debug',
   endpoint: 'ws://localhost:8000/websocket',
@@ -602,7 +602,7 @@ const interval = new Interval({
             <button onclick="window.alert">Button</button>
           </form>
 
-          <iframe src="https://interval.com"></iframe>
+          <iframe src="https://utilhq.com"></iframe>
 
           <p class="text-xl" style="color: red;">Hello, in red!</p>
           <p class="text-lg">
@@ -810,7 +810,7 @@ const interval = new Interval({
           level: 2,
           description: 'A section heading here',
           menuItems: [
-            { label: 'Link', url: 'https://interval.com', theme: 'primary' },
+            { label: 'Link', url: 'https://utilhq.com', theme: 'primary' },
             { label: 'Danger', action: 'disabled_inputs', theme: 'danger' },
           ],
         }),
@@ -985,7 +985,7 @@ const interval = new Interval({
           io.input.number('Number input', { defaultValue: null }).optional(),
           io.input.number('Number input', { defaultValue: 100 }),
           io.input.email('Email input').optional(),
-          io.input.email('Email input', { defaultValue: 'hi@interval.com' }),
+          io.input.email('Email input', { defaultValue: 'hi@utilhq.com' }),
           io.input
             .richText('Rich text input', { defaultValue: null })
             .optional(),
@@ -1148,7 +1148,7 @@ const interval = new Interval({
     },
     'unauthorized-error': unauthorized,
     bare_string_return: async () => {
-      return 'Hello, Interval!'
+      return 'Hello, utilhq!'
     },
     bare_list_return: async io => {
       return await io.group([
@@ -1239,7 +1239,7 @@ const interval = new Interval({
         {
           label: 'External link',
           value: 'Click me',
-          url: 'https://interval.com',
+          url: 'https://utilhq.com',
         },
         {
           label: 'Image',
@@ -1410,7 +1410,7 @@ const interval = new Interval({
     },
     confirmBeforeDelete: async (io, ctx) => {
       const email = await io.input.email('Enter an email address', {
-        defaultValue: 'hello@interval.com',
+        defaultValue: 'hello@utilhq.com',
       })
 
       const shouldDelete = await io.confirm(`Delete this user?`, {
@@ -1556,7 +1556,7 @@ const interval = new Interval({
     richText: async io => {
       const [body, to] = await io.group([
         io.input.richText('Enter email body', {
-          defaultValue: '<h2>Welcome to Interval!</h2><p>Enjoy your stay.</p>',
+          defaultValue: '<h2>Welcome to utilhq!</h2><p>Enjoy your stay.</p>',
           helpText: 'This will be sent to the user.',
         }),
         io.input.email('Email address'),
@@ -1742,7 +1742,7 @@ const interval = new Interval({
       await io.group([
         io.display.object('User', {
           data: {
-            name: 'Interval',
+            name: 'utilhq',
             action: { isTrue: true, createdAt: new Date() },
           },
         }),
@@ -1763,7 +1763,7 @@ const interval = new Interval({
 
       const users = await fakeDb
         .find('')
-        .then(res => res.map(mapToIntervalUser).slice(0, 3))
+        .then(res => res.map(mapToUtilHQUser).slice(0, 3))
 
       await io.display.table('Users to process', {
         data: users,
@@ -1842,9 +1842,9 @@ const interval = new Interval({
     a_readonly_demo: async io => {
       await io.group(
         [
-          io.input.text('Full name', { defaultValue: 'Interval' }),
+          io.input.text('Full name', { defaultValue: 'utilhq' }),
           io.input.email('Email address', {
-            defaultValue: 'hello@interval.com',
+            defaultValue: 'hello@utilhq.com',
           }),
           io.input.date('Start date', {
             defaultValue: new Date(),
@@ -2040,7 +2040,7 @@ const interval = new Interval({
         single: async io => {
           const file = await io.input.file('Upload an image!', {
             helpText:
-              'Will be uploaded to Interval and expire after the action finishes running.',
+              'Will be uploaded to utilhq and expire after the action finishes running.',
             allowedExtensions: ['.gif', '.jpg', '.jpeg', '.png'],
           })
 
@@ -2054,7 +2054,7 @@ const interval = new Interval({
           const files = await io.input
             .file('Upload an image!', {
               helpText:
-                'Will be uploaded to Interval and expire after the action finishes running.',
+                'Will be uploaded to utilhq and expire after the action finishes running.',
               allowedExtensions: ['.gif', '.jpg', '.jpeg', '.png'],
             })
             .multiple()
@@ -2103,7 +2103,7 @@ const interval = new Interval({
       })
     },
     badMessage: async () => {
-      const client = new IntervalClient(interval, interval.config)
+      const client = new UtilHQClient(utilhq, utilhq.config)
 
       // @ts-expect-error: Intentionally using private method
       await client.initializeConnection()
@@ -2300,4 +2300,4 @@ const interval = new Interval({
   },
 })
 
-interval.listen()
+utilhq.listen()

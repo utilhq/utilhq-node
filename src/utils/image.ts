@@ -1,10 +1,10 @@
-import IntervalError from '../classes/IntervalError'
+import UtilHQError from '../classes/UtilHQError'
 
 const MAX_BUFFER_SIZE_MB = 50
 
 export function bufferToDataUrl(buffer: Buffer): string {
   if (Buffer.byteLength(buffer) > MAX_BUFFER_SIZE_MB * 1000 * 1000) {
-    throw new IntervalError(
+    throw new UtilHQError(
       `Buffer for image is too large, must be under ${MAX_BUFFER_SIZE_MB} MB`
     )
   }

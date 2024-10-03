@@ -1,7 +1,7 @@
-import { IntervalActionHandler } from '../..'
+import { UtilHQActionHandler } from '../..'
 import { fakeDb, getImageUrl } from '../utils/helpers'
 
-const editEmailForUser: IntervalActionHandler = async io => {
+const editEmailForUser: UtilHQActionHandler = async io => {
   console.log("Let's say hello...")
 
   type User = Awaited<ReturnType<typeof fakeDb['find']>>[0]
