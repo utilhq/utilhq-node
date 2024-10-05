@@ -8,7 +8,12 @@
     "url": "github:utilhq/utilhq-node"
   },
   "bugs": "https://github.com/utilhq/utilhq-node/issues",
-  "keywords": ["internal tool", "app", "ui", "ui builder"],
+  "keywords": [
+    "internal tool",
+    "app",
+    "ui",
+    "ui builder"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=12.17.0"
